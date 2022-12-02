@@ -1,7 +1,5 @@
 CC=cc
 CFLAGS= -Wall -Werror -Wextra
-CC=cc
-CFLAGS=-Wall -Werror -Wextra
 LIBFT=libft/libft.a
 
 CLNT_EXEC=client
@@ -18,10 +16,10 @@ $(NAME):client server
 
 
 client:client.c client.h $(HDRS) $(LIBFT)
-	gcc client.c -lft -Llibft -o client
+	$(CC) $(CFLAGS) client.c -lft -Llibft -o client
 
 server:server.c server.h $(HDRS) $(LIBFT)
-	gcc server.c -lft -Llibft -o server
+	$(CC) $(CFLAGS) server.c -lft -Llibft -o server
 	
 $(LIBFT):
 	make -C libft
@@ -34,6 +32,9 @@ clean:
 fclean: clean
 	rm -rf $(CLNT_EXEC) $(SVR_EXEC)
 
+bonus: all
+
 re: fclean all
 
-.PHONY=all re clean fclean $(NAME)
+
+.PHONY=all re clean fclean $(NAME) bonus
