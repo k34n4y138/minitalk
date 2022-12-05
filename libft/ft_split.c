@@ -43,7 +43,7 @@ static size_t	size_till_seplen(char const *s, char c)
 
 static char	**panic_exit(char **ptr, size_t j)
 {
-	while (j >= 0)
+	while (j > 0)
 		free(ptr[j--]);
 	free(ptr);
 	return (0);
