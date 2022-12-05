@@ -6,7 +6,7 @@
 /*   By: zmoumen <zmoumen@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/30 10:48:12 by zmoumen           #+#    #+#             */
-/*   Updated: 2022/12/01 19:48:17 by zmoumen          ###   ########.fr       */
+/*   Updated: 2022/12/05 18:12:40 by zmoumen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,9 @@ void	process_signal(int hldr)
 	static char	cntr = 0;
 	char		newbit;
 
-	newbit = hldr - SIGUSR1;
+	newbit = 0;
+	if (hldr == SIGUSR2)
+		newbit = 1;
 	acmltr = (acmltr << 1) | newbit;
 	cntr++;
 	if (cntr == 8)
@@ -38,13 +40,10 @@ void	process_signal(int hldr)
 int	main(void)
 {
 	pid_t				serverpid;
-	struct sigaction	sigact;
 
 	serverpid = getpid();
-	sigact.sa_handler = handler;
-	sigact.sa_flags = 0;
-	sigaction(SIGUSR1, &sigact, NULL);
-	sigaction(SIGUSR2, &sigact, NULL);
+	signal(SIGUSR1, handler);
+	signal(SIGUSR2, handler);
 	ft_printf("server is up and running with process id: %d\n", serverpid);
 	while (1)
 	{

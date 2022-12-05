@@ -6,7 +6,7 @@
 /*   By: zmoumen <zmoumen@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/25 16:58:30 by zmoumen           #+#    #+#             */
-/*   Updated: 2022/12/01 19:32:04 by zmoumen          ###   ########.fr       */
+/*   Updated: 2022/12/05 19:46:39 by zmoumen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@ typedef struct sigpack_s
 {
 	pid_t	cl_pid;
 	int		signal;
-	int		new;
 }		t_sigpack;
 
 #endif

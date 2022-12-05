@@ -32,7 +32,10 @@ clean:
 fclean: clean
 	rm -rf $(CLNT_EXEC) $(SVR_EXEC)
 
-bonus: all
+bonus: $(LIBFT)
+	$(CC) $(CFLAGS) client_bonus.c -lft -Llibft -o client
+	$(CC) $(CFLAGS) server_bonus.c -lft -Llibft -o server
+
 
 re: fclean all
 
