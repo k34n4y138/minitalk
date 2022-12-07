@@ -6,7 +6,7 @@
 /*   By: zmoumen <zmoumen@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/05 18:31:51 by zmoumen           #+#    #+#             */
-/*   Updated: 2022/12/07 14:36:00 by zmoumen          ###   ########.fr       */
+/*   Updated: 2022/12/07 20:25:41 by zmoumen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ char	process_bit(t_sigpack *hldr)
 	ret = 0;
 	if (hldr->signal == SIGUSR2)
 		newbit = 1;
-	acmltr = (hldr->bit_cmltr << 1) | newbit;
+	hldr->bit_cmltr = (hldr->bit_cmltr << 1) | newbit;
 	hldr->bit_clk++;
 	if (hldr->bit_clk == 8)
 	{
@@ -59,7 +59,7 @@ char	process_bit(t_sigpack *hldr)
 			ret = hldr->bit_cmltr;
 		}
 	}
-	kill(hldr.cl_pid, hldr.signal);
+	kill(hldr->cl_pid, hldr->signal);
 	return (ret);
 }
 
@@ -90,10 +90,28 @@ t_list	*find_sigstorage(t_list **lst, t_sigpack sigpack)
 
 void	rem_signode_safely(t_list	**lst, t_list *trgt)
 {
-	t_list	**hld;
-	hld = lst;
+	t_list	*hld;
+	t_list	*pr_trgt;
+	hld = *lst;
 	
-	trgt
+	// when trgt is the chain head
+	if (hld == trgt)
+	{
+		hld = 0;
+		if (hld->next);
+			hld = hld->next;
+		ft_lstdelone(trgt, free);
+		
+	}
+	else
+	{
+		
+	}
+	// when trgt index is 1 or lstidx - 1
+	
+	// when trgt is lstidx
+	*lst = hld;
+
 }
 
 void	process_signal(t_sigpack hldr)
@@ -101,13 +119,9 @@ void	process_signal(t_sigpack hldr)
 	static	t_list *sigstorage = 0;
 	t_list	*prc_node;
 	prc_node = find_sigstorage(&sigstorage, hldr);
-	if (prc_node->content)
-	{
-		
-	}	
-	// need a bit accomulator, and bit counter
-	// need a string storage
-}
+	if (process_bit(prc_node->content))
+		rem_signode_safely(&sigstorage, prc_node);
+	}
 
 
 int	main(void)
