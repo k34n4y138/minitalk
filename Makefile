@@ -22,7 +22,7 @@ server:server.c server.h $(HDRS) $(LIBFT)
 	$(CC) $(CFLAGS) server.c -lft -Llibft -o server
 	
 $(LIBFT):
-	make -C libft
+	make -C bonus
 
 all: $(NAME)
 

@@ -6,13 +6,13 @@
 /*   By: zmoumen <zmoumen@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/05 18:31:51 by zmoumen           #+#    #+#             */
-/*   Updated: 2022/12/05 20:24:34 by zmoumen          ###   ########.fr       */
+/*   Updated: 2022/12/07 14:36:00 by zmoumen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "server.h"
 
- t_sigpack	g_signal;
+t_sigpack	g_signal;
 
 void	handler(int sig, siginfo_t *siginfo, void *ctx)
 {
@@ -21,55 +21,94 @@ void	handler(int sig, siginfo_t *siginfo, void *ctx)
 	g_signal.signal = sig;
 }
 
-// void	process_signal(t_sigpack hldr)
-// {
-// 	static char	acmltr = 0;
-// 	static char	cntr = 0;
-// 	char		newbit;
-
-// 	newbit = 0;
-// 	if (hldr.signal == SIGUSR2)
-// 		newbit = 1;
-// 	acmltr = (acmltr << 1) | newbit;
-// 	cntr++;
-// 	if (cntr == 8)
-// 	{
-// 		write(1, &acmltr, 1);
-// 		cntr = 0;
-// 	}
-// 	kill(hldr.cl_pid, hldr.signal);
-// }
-
-void process_signal(t_sigpack hldr)
+char	*charapndtostr(char **str, char c, int *strlen)
 {
-	static char acmltr = 0;
-	static char cntr = 0;
-	static char *str = NULL;
-	static int str_len = 0;
-	char newbit;
+	char	*tofree;
+	
+	tofree = *str;
+	*str = ft_calloc(++(*strlen) + 1, 1);
+	if (tofree)
+	{
+		ft_strlcat(*str, tofree, *strlen + 1);
+		free(tofree);
+	}
+	*str[*strlen - 1] = c;
+	return (*str);
+}
+
+char	process_bit(t_sigpack *hldr)
+{
+	char		newbit;
+	char		ret;
 
 	newbit = 0;
-	if (hldr.signal == SIGUSR2)
+	ret = 0;
+	if (hldr->signal == SIGUSR2)
 		newbit = 1;
-	acmltr = (acmltr << 1) | newbit;
-	cntr++;
-	if (cntr == 8)
+	acmltr = (hldr->bit_cmltr << 1) | newbit;
+	hldr->bit_clk++;
+	if (hldr->bit_clk == 8)
 	{
-		str_len++;
-		str = realloc(str, str_len);
-		str[str_len - 1] = acmltr;
-		if (acmltr == '\0')
+		charapndtostr(&(hldr->str), hldr->bit_cmltr, &(hldr->strlen));
+		hldr->bit_clk = 0;
+		if (hldr->bit_cmltr == 0 || hldr->bit_cmltr == '\n')
 		{
-			str = realloc(str, str_len + 1);
-			str[str_len] = '\0';
-			ft_printf("%s\n", str);
-			free(str);
-			str = 0;
+			ft_putstr_fd(hldr->str, 1);
+			free(hldr->str);
+			hldr->strlen = 0;
+			ret = hldr->bit_cmltr;
 		}
-	cntr = 0;
 	}
 	kill(hldr.cl_pid, hldr.signal);
+	return (ret);
 }
+
+t_list	*find_signode(t_list *lst,int pid)
+{
+	while (lst)
+	{
+		if (((t_sigpack *)lst->content)->cl_pid == pid)
+			return (lst);
+		lst = lst->next;
+	}
+	return (NULL);
+}
+
+t_list	*find_sigstorage(t_list **lst, t_sigpack sigpack)
+{
+	t_list	*node;
+	node = find_signode(*lst, sigpack.cl_pid);
+	if (!node)
+	{
+		node = ft_lstnew(ft_calloc(1, sizeof(t_sigpack)));
+		((t_sigpack *)(*lst)->content)->cl_pid = sigpack.cl_pid;
+		((t_sigpack *)(*lst)->content)->signal = sigpack.signal;
+		ft_lstadd_back(lst, node);
+	}
+	return (node);
+}
+
+void	rem_signode_safely(t_list	**lst, t_list *trgt)
+{
+	t_list	**hld;
+	hld = lst;
+	
+	trgt
+}
+
+void	process_signal(t_sigpack hldr)
+{
+	static	t_list *sigstorage = 0;
+	t_list	*prc_node;
+	prc_node = find_sigstorage(&sigstorage, hldr);
+	if (prc_node->content)
+	{
+		
+	}	
+	// need a bit accomulator, and bit counter
+	// need a string storage
+}
+
 
 int	main(void)
 {
