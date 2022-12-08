@@ -6,11 +6,11 @@
 /*   By: zmoumen <zmoumen@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/05 18:31:51 by zmoumen           #+#    #+#             */
-/*   Updated: 2022/12/07 20:25:41 by zmoumen          ###   ########.fr       */
+/*   Updated: 2022/12/08 20:01:12 by zmoumen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "server.h"
+#include "server_bonus.h"
 
 t_sigpack	g_signal;
 
@@ -19,21 +19,6 @@ void	handler(int sig, siginfo_t *siginfo, void *ctx)
 	(void)ctx;
 	g_signal.cl_pid = siginfo->si_pid;
 	g_signal.signal = sig;
-}
-
-char	*charapndtostr(char **str, char c, int *strlen)
-{
-	char	*tofree;
-	
-	tofree = *str;
-	*str = ft_calloc(++(*strlen) + 1, 1);
-	if (tofree)
-	{
-		ft_strlcat(*str, tofree, *strlen + 1);
-		free(tofree);
-	}
-	*str[*strlen - 1] = c;
-	return (*str);
 }
 
 char	process_bit(t_sigpack *hldr)
@@ -49,80 +34,29 @@ char	process_bit(t_sigpack *hldr)
 	hldr->bit_clk++;
 	if (hldr->bit_clk == 8)
 	{
-		charapndtostr(&(hldr->str), hldr->bit_cmltr, &(hldr->strlen));
+		charapndtostr(hldr->str, hldr->bit_cmltr, (hldr->strlen)++);
 		hldr->bit_clk = 0;
-		if (hldr->bit_cmltr == 0 || hldr->bit_cmltr == '\n')
+		if (hldr->bit_cmltr == 0 || hldr->bit_cmltr == '\n'
+			|| hldr->strlen == BUFFER_SIZE - 1)
 		{
 			ft_putstr_fd(hldr->str, 1);
-			free(hldr->str);
-			hldr->strlen = 0;
-			ret = hldr->bit_cmltr;
+			ret = 1;
+			hldr->bit_cmltr = 0;
 		}
 	}
 	kill(hldr->cl_pid, hldr->signal);
 	return (ret);
 }
 
-t_list	*find_signode(t_list *lst,int pid)
-{
-	while (lst)
-	{
-		if (((t_sigpack *)lst->content)->cl_pid == pid)
-			return (lst);
-		lst = lst->next;
-	}
-	return (NULL);
-}
-
-t_list	*find_sigstorage(t_list **lst, t_sigpack sigpack)
-{
-	t_list	*node;
-	node = find_signode(*lst, sigpack.cl_pid);
-	if (!node)
-	{
-		node = ft_lstnew(ft_calloc(1, sizeof(t_sigpack)));
-		((t_sigpack *)(*lst)->content)->cl_pid = sigpack.cl_pid;
-		((t_sigpack *)(*lst)->content)->signal = sigpack.signal;
-		ft_lstadd_back(lst, node);
-	}
-	return (node);
-}
-
-void	rem_signode_safely(t_list	**lst, t_list *trgt)
-{
-	t_list	*hld;
-	t_list	*pr_trgt;
-	hld = *lst;
-	
-	// when trgt is the chain head
-	if (hld == trgt)
-	{
-		hld = 0;
-		if (hld->next);
-			hld = hld->next;
-		ft_lstdelone(trgt, free);
-		
-	}
-	else
-	{
-		
-	}
-	// when trgt index is 1 or lstidx - 1
-	
-	// when trgt is lstidx
-	*lst = hld;
-
-}
-
 void	process_signal(t_sigpack hldr)
 {
-	static	t_list *sigstorage = 0;
-	t_list	*prc_node;
+	static t_list	*sigstorage = 0;
+	t_list			*prc_node;
+
 	prc_node = find_sigstorage(&sigstorage, hldr);
 	if (process_bit(prc_node->content))
 		rem_signode_safely(&sigstorage, prc_node);
-	}
-
+}
 
 int	main(void)
 {

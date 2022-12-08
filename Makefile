@@ -4,25 +4,23 @@ LIBFT=libft/libft.a
 
 CLNT_EXEC=client
 CLNT_SRCS=client.c
-CLNT_HDRS=client.h
 
 SVR_EXEC=server
 SVR_SRCS=sever.c
-SVR_HDRS=server.h
 
 NAME=minitalk
 
 $(NAME):client server
 
 
-client:client.c client.h $(HDRS) $(LIBFT)
+client:client.c $(HDRS) $(LIBFT)
 	$(CC) $(CFLAGS) client.c -lft -Llibft -o client
 
-server:server.c server.h $(HDRS) $(LIBFT)
+server:server.c $(HDRS) $(LIBFT)
 	$(CC) $(CFLAGS) server.c -lft -Llibft -o server
 	
 $(LIBFT):
-	make -C bonus
+	make -C libft bonus
 
 all: $(NAME)
 
@@ -34,7 +32,7 @@ fclean: clean
 
 bonus: $(LIBFT)
 	$(CC) $(CFLAGS) client_bonus.c -lft -Llibft -o client
-	$(CC) $(CFLAGS) server_bonus.c -lft -Llibft -o server
+	$(CC) $(CFLAGS) server_bonus.c server_utils_bonus.c -lft -Llibft -o server
 
 
 re: fclean all

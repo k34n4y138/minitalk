@@ -6,11 +6,12 @@
 /*   By: zmoumen <zmoumen@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/25 16:36:39 by zmoumen           #+#    #+#             */
-/*   Updated: 2022/12/05 15:57:55 by zmoumen          ###   ########.fr       */
+/*   Updated: 2022/12/08 19:29:44 by zmoumen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "client.h"
+#include "libft/libft.h"
+#include <signal.h>
 
 int	emit_message(char *msg, int spid)
 {
@@ -33,7 +34,7 @@ int	emit_message(char *msg, int spid)
 				trgtsig = SIGUSR2;
 			if (kill(spid, trgtsig) == -1)
 				return (-1);
-			usleep(80);
+			usleep(100);
 		}
 		i++;
 	}

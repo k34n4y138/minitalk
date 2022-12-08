@@ -6,11 +6,12 @@
 /*   By: zmoumen <zmoumen@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/30 10:48:12 by zmoumen           #+#    #+#             */
-/*   Updated: 2022/12/05 18:12:40 by zmoumen          ###   ########.fr       */
+/*   Updated: 2022/12/08 18:57:35 by zmoumen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "server.h"
+#include "libft/libft.h"
+#include <signal.h>
 
 int	g_signal;
 
