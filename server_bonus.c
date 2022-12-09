@@ -5,26 +5,53 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: zmoumen <zmoumen@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/12/05 18:31:51 by zmoumen           #+#    #+#             */
-/*   Updated: 2022/12/08 20:01:12 by zmoumen          ###   ########.fr       */
+/*   Created: 2022/12/09 10:48:57 by zmoumen           #+#    #+#             */
+/*   Updated: 2022/12/09 19:30:38 by zmoumen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "server_bonus.h"
 
-t_sigpack	g_signal;
+t_sigpack	g_signal = {0};
 
 void	handler(int sig, siginfo_t *siginfo, void *ctx)
 {
-	(void)ctx;
+	if (g_signal.new)
+		return ;
+	g_signal.new = 1;
 	g_signal.cl_pid = siginfo->si_pid;
 	g_signal.signal = sig;
+	(void)ctx;
 }
 
-char	process_bit(t_sigpack *hldr)
+t_sigpack	*find_sigpack(t_sigpack strg[], int cl_pid)
+{
+	int	idx;
+
+	idx = 0;
+	while (idx < SIGPACKS_ARRSIZE)
+	{
+		if (strg[idx].cl_pid == cl_pid)
+			return (&strg[idx]);
+		idx++;
+	}
+	idx = 0;
+	while (idx < SIGPACKS_ARRSIZE)
+	{
+		if (strg[idx].cl_pid == 0)
+		{
+			strg[idx].cl_pid = cl_pid;
+			return (&strg[idx]);
+		}
+		idx++;
+	}
+	return (NULL);
+}
+
+int	process_bit(t_sigpack *hldr)
 {
 	char		newbit;
-	char		ret;
+	int			ret;
 
 	newbit = 0;
 	ret = 0;
@@ -32,30 +59,36 @@ char	process_bit(t_sigpack *hldr)
 		newbit = 1;
 	hldr->bit_cmltr = (hldr->bit_cmltr << 1) | newbit;
 	hldr->bit_clk++;
-	if (hldr->bit_clk == 8)
+	if (hldr->bit_clk > 7)
 	{
-		charapndtostr(hldr->str, hldr->bit_cmltr, (hldr->strlen)++);
+		hldr->str[(hldr->strlen)++] = hldr->bit_cmltr;
 		hldr->bit_clk = 0;
 		if (hldr->bit_cmltr == 0 || hldr->bit_cmltr == '\n'
-			|| hldr->strlen == BUFFER_SIZE - 1)
+			|| hldr->strlen >= BUFFER_SIZE - 1)
 		{
-			ft_putstr_fd(hldr->str, 1);
+			write(1, hldr->str, hldr->strlen);
 			ret = 1;
-			hldr->bit_cmltr = 0;
+			hldr->strlen = 0;
 		}
 	}
-	kill(hldr->cl_pid, hldr->signal);
 	return (ret);
 }
 
-void	process_signal(t_sigpack hldr)
+void	process_signal(int cl_pid, int newsig)
 {
-	static t_list	*sigstorage = 0;
-	t_list			*prc_node;
+	static t_sigpack	storage[SIGPACKS_ARRSIZE] = {0};
+	static t_sigpack	*last_sender = NULL;
 
-	prc_node = find_sigstorage(&sigstorage, hldr);
-	if (process_bit(prc_node->content))
-		rem_signode_safely(&sigstorage, prc_node);
+	g_signal.new = 0;
+	if (!last_sender
+		|| (last_sender && last_sender->cl_pid != cl_pid))
+		last_sender = find_sigpack(storage, cl_pid);
+	if (!last_sender)
+		return ;
+	last_sender->signal = newsig;
+	process_bit(last_sender);
+	usleep(30);
+	kill(last_sender->cl_pid, last_sender->signal);
 }
 
 int	main(void)
@@ -68,10 +101,12 @@ int	main(void)
 	sigact.sa_flags = SA_SIGINFO;
 	sigaction(SIGUSR1, &sigact, NULL);
 	sigaction(SIGUSR2, &sigact, NULL);
+	g_signal.new = 0;
 	ft_printf("server is up and running with process id: %d\n", serverpid);
 	while (1)
 	{
-		pause();
-		process_signal(g_signal);
+		if (!g_signal.new)
+			pause();
+		process_signal(g_signal.cl_pid, g_signal.signal);
 	}
 }
