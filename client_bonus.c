@@ -6,43 +6,46 @@
 /*   By: zmoumen <zmoumen@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/05 18:14:41 by zmoumen           #+#    #+#             */
-/*   Updated: 2022/12/09 18:44:47 by zmoumen          ###   ########.fr       */
+/*   Updated: 2022/12/11 16:19:57 by zmoumen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft/libft.h"
 #include <signal.h>
 
-int	g_serve_ack = 0;
+int	g_server_ack = 0;
 
 void	server_ack(int sig)
 {
-	g_serve_ack = sig;
+	g_server_ack = sig;
 }
 
 int	emit_n_wait_ack(int spid, int sent_sig)
 {
-	static int	gracefull_missfire = 0;
+	static int	graceful_missfire = 0;
 	int			retrn;
 
-	g_serve_ack = 0;
 	if (kill(spid, sent_sig) == -1)
 		return (-1);
-	sleep(1);
-	if (g_serve_ack == 0)
+	if (!g_server_ack)
+		sleep(1);
+	if (g_server_ack == 0)
 	{
-		gracefull_missfire++;
+		g_server_ack = 0;
+		graceful_missfire++;
 		retrn = -2;
 	}
-	else if (g_serve_ack != sent_sig)
+	else if (g_server_ack != sent_sig)
 		retrn = -4;
 	else
 	{
-		gracefull_missfire = 0;
+		g_server_ack = 0;
+		graceful_missfire = 0;
 		retrn = 0;
 	}
-	if (retrn == -2 && gracefull_missfire == 6)
+	if (retrn == -2 && graceful_missfire == 6)
 		retrn = -3;
+	usleep(30);
 	return (retrn);
 }
 
@@ -95,12 +98,15 @@ int	main(int ac, char **av)
 			"or you don't have permissions to signal this process\n");
 	emmit_res = emit_message(av[2], ft_atoi(av[1]));
 	if (emmit_res == -1)
-		ft_printf("%s: [!]Server crashed!\n", av[0]);
+		ft_printf("%s: [!] Server crashed!\n", av[0]);
 	else if (emmit_res == -4)
-		ft_printf("%s: [!]Server didn't acknowledge data properly!\n", av[0]);
+		ft_printf("%s: [!] Server didn't acknowledge data properly!\n", av[0]);
 	else if (emmit_res == -3)
-		ft_printf("%s: [!]TIMEOUT!! server took too long to ack!\n", av[0]);
+		ft_printf("%s: [!] TIMEOUT!! server took too long to ack!\n", av[0]);
 	else
-		ft_printf("%s: [✓]Transmission has finished successfully\n", av[0]);
+	{
+		ft_printf("%s: [✓] Transmission is finished successfully\n", av[0]);
+		return (0);
+	}
 	return (1);
 }

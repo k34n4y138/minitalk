@@ -13,7 +13,7 @@ server:server.c $(LIBFT)
 	$(CC) $(CFLAGS) server.c -lft -Llibft -o server
 	
 $(LIBFT):
-	make -C libft bonus
+	make -C libft
 
 all: $(NAME)
 

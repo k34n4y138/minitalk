@@ -6,7 +6,7 @@
 /*   By: zmoumen <zmoumen@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 10:48:57 by zmoumen           #+#    #+#             */
-/*   Updated: 2022/12/09 19:30:38 by zmoumen          ###   ########.fr       */
+/*   Updated: 2022/12/11 16:28:00 by zmoumen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ void	handler(int sig, siginfo_t *siginfo, void *ctx)
 
 t_sigpack	*find_sigpack(t_sigpack strg[], int cl_pid)
 {
-	int	idx;
+	int			idx;
 
 	idx = 0;
 	while (idx < SIGPACKS_ARRSIZE)
@@ -36,7 +36,7 @@ t_sigpack	*find_sigpack(t_sigpack strg[], int cl_pid)
 		idx++;
 	}
 	idx = 0;
-	while (idx < SIGPACKS_ARRSIZE)
+	while (idx <= SIGPACKS_ARRSIZE)
 	{
 		if (strg[idx].cl_pid == 0)
 		{
@@ -51,15 +51,13 @@ t_sigpack	*find_sigpack(t_sigpack strg[], int cl_pid)
 int	process_bit(t_sigpack *hldr)
 {
 	char		newbit;
-	int			ret;
 
 	newbit = 0;
-	ret = 0;
 	if (hldr->signal == SIGUSR2)
 		newbit = 1;
 	hldr->bit_cmltr = (hldr->bit_cmltr << 1) | newbit;
 	hldr->bit_clk++;
-	if (hldr->bit_clk > 7)
+	if (hldr->bit_clk == 8)
 	{
 		hldr->str[(hldr->strlen)++] = hldr->bit_cmltr;
 		hldr->bit_clk = 0;
@@ -67,11 +65,11 @@ int	process_bit(t_sigpack *hldr)
 			|| hldr->strlen >= BUFFER_SIZE - 1)
 		{
 			write(1, hldr->str, hldr->strlen);
-			ret = 1;
 			hldr->strlen = 0;
+			return (1);
 		}
 	}
-	return (ret);
+	return (0);
 }
 
 void	process_signal(int cl_pid, int newsig)
@@ -86,9 +84,10 @@ void	process_signal(int cl_pid, int newsig)
 	if (!last_sender)
 		return ;
 	last_sender->signal = newsig;
-	process_bit(last_sender);
+	if (process_bit(last_sender))
+		last_sender->cl_pid = 0;
 	usleep(30);
-	kill(last_sender->cl_pid, last_sender->signal);
+	kill(cl_pid, newsig);
 }
 
 int	main(void)
