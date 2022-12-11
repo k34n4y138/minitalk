@@ -6,7 +6,7 @@
 /*   By: zmoumen <zmoumen@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/30 10:48:12 by zmoumen           #+#    #+#             */
-/*   Updated: 2022/12/11 16:32:32 by zmoumen          ###   ########.fr       */
+/*   Updated: 2022/12/11 20:11:03 by zmoumen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,12 +16,14 @@
 struct	s_signal {
 	int	cl_pid;
 	int	signal;
+	int	new;
 }		g_signal = {0};
 
 void	handler(int sig, siginfo_t *siginfo, void *ctx)
 {
 	g_signal.cl_pid = siginfo->si_pid;
 	g_signal.signal = sig;
+	g_signal.new = 1;
 	(void)ctx;
 }
 
@@ -32,11 +34,11 @@ void	process_signal(int rxsig, int cl_pid)
 	static int	last_sender = 0;
 	char		newbit;
 
+	g_signal.new = 0;
 	if (last_sender != cl_pid)
 	{
 		last_sender = cl_pid;
 		cntr = 0;
-		acmltr = 0;
 	}
 	newbit = 0;
 	if (rxsig == SIGUSR2)
@@ -48,6 +50,8 @@ void	process_signal(int rxsig, int cl_pid)
 		write(1, &acmltr, 1);
 		cntr = 0;
 	}
+	usleep(60);
+	kill(cl_pid, SIGUSR1);
 }
 
 int	main(void)
@@ -63,7 +67,8 @@ int	main(void)
 	ft_printf("server is up and running with process id: %d\n", serverpid);
 	while (1)
 	{
-		pause();
+		if (!g_signal.new)
+			pause();
 		process_signal(g_signal.signal, g_signal.cl_pid);
 	}
 }

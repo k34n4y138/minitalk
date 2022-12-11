@@ -6,7 +6,7 @@
 /*   By: zmoumen <zmoumen@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/08 14:52:08 by zmoumen           #+#    #+#             */
-/*   Updated: 2022/12/11 16:13:48 by zmoumen          ###   ########.fr       */
+/*   Updated: 2022/12/11 20:15:05 by zmoumen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 # define SERVER_BONUS_H
 # include "libft/libft.h"
 # include <signal.h>
-# define BUFFER_SIZE 8000
+# define BUFFER_SIZE 1024
 # define SIGPACKS_ARRSIZE 2048
 
 typedef struct sigpack_s

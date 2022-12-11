@@ -6,7 +6,7 @@
 /*   By: zmoumen <zmoumen@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/05 18:14:41 by zmoumen           #+#    #+#             */
-/*   Updated: 2022/12/11 16:19:57 by zmoumen          ###   ########.fr       */
+/*   Updated: 2022/12/11 20:34:32 by zmoumen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ int	g_server_ack = 0;
 void	server_ack(int sig)
 {
 	g_server_ack = sig;
+	usleep(30);
 }
 
 int	emit_n_wait_ack(int spid, int sent_sig)
@@ -45,7 +46,6 @@ int	emit_n_wait_ack(int spid, int sent_sig)
 	}
 	if (retrn == -2 && graceful_missfire == 6)
 		retrn = -3;
-	usleep(30);
 	return (retrn);
 }
 

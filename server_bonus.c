@@ -6,7 +6,7 @@
 /*   By: zmoumen <zmoumen@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 10:48:57 by zmoumen           #+#    #+#             */
-/*   Updated: 2022/12/11 16:28:00 by zmoumen          ###   ########.fr       */
+/*   Updated: 2022/12/11 20:27:01 by zmoumen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ void	handler(int sig, siginfo_t *siginfo, void *ctx)
 	g_signal.cl_pid = siginfo->si_pid;
 	g_signal.signal = sig;
 	(void)ctx;
+	usleep(10);
 }
 
 t_sigpack	*find_sigpack(t_sigpack strg[], int cl_pid)
@@ -86,7 +87,7 @@ void	process_signal(int cl_pid, int newsig)
 	last_sender->signal = newsig;
 	if (process_bit(last_sender))
 		last_sender->cl_pid = 0;
-	usleep(30);
+	usleep(100);
 	kill(cl_pid, newsig);
 }
 
