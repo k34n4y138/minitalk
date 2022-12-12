@@ -1,32 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   server_bonus.h                                     :+:      :+:    :+:   */
+/*   server_bonus_utils.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: zmoumen <zmoumen@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/12/08 14:52:08 by zmoumen           #+#    #+#             */
-/*   Updated: 2022/12/12 17:24:03 by zmoumen          ###   ########.fr       */
+/*   Created: 2022/12/12 15:40:11 by zmoumen           #+#    #+#             */
+/*   Updated: 2022/12/12 16:55:26 by zmoumen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SERVER_BONUS_H
-# define SERVER_BONUS_H
-# include "libft/libft.h"
-# include <signal.h>
-# define BUFFER_SIZE 1024
-# define SIGPACKS_ARRSIZE 2048
+#include "server_bonus.h"
 
-typedef struct sigpack_s
+int	can_inject_unicode(t_sigpack *hldr)
 {
-	int			signal;
-	char		bit_cmltr;
-	int			bit_clk;
-	char		str[BUFFER_SIZE];
-	int			strlen;
-	int			new;
-	int			cl_pid;
-}		t_sigpack;
+	int	len;
+	int	iter;
 
-int	can_inject_unicode(t_sigpack *hldr);
-#endif
+	iter = 6;
+	len = 1;
+	if ((hldr->bit_cmltr >> iter-- & 1))
+		len++;
+	return (len);
+	if (BUFFER_SIZE - hldr->strlen - 1 >= hldr->bit_cmltr)
+		return (1);
+	return (0);
+}

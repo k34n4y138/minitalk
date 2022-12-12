@@ -6,7 +6,7 @@
 /*   By: zmoumen <zmoumen@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/09 10:48:57 by zmoumen           #+#    #+#             */
-/*   Updated: 2022/12/11 20:27:01 by zmoumen          ###   ########.fr       */
+/*   Updated: 2022/12/12 15:40:38 by zmoumen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,8 +60,13 @@ int	process_bit(t_sigpack *hldr)
 	hldr->bit_clk++;
 	if (hldr->bit_clk == 8)
 	{
-		hldr->str[(hldr->strlen)++] = hldr->bit_cmltr;
 		hldr->bit_clk = 0;
+		if (hldr->bit_cmltr < 0 && !can_inject_unicode(hldr))
+		{
+			write(1, hldr->str, hldr->strlen);
+			hldr->strlen = 0;
+		}
+		hldr->str[(hldr->strlen)++] = hldr->bit_cmltr;
 		if (hldr->bit_cmltr == 0 || hldr->bit_cmltr == '\n'
 			|| hldr->strlen >= BUFFER_SIZE - 1)
 		{

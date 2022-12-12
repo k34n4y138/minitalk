@@ -25,7 +25,7 @@ fclean: clean
 
 bonus: $(LIBFT)
 	$(CC) $(CFLAGS) client_bonus.c -lft -Llibft -o client
-	$(CC) $(CFLAGS) server_bonus.c -lft -Llibft -o server
+	$(CC) $(CFLAGS) server_bonus.c server_bonus_utils.c -lft -Llibft -o server
 
 
 re: fclean all

@@ -6,7 +6,7 @@
 /*   By: zmoumen <zmoumen@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/05 18:14:41 by zmoumen           #+#    #+#             */
-/*   Updated: 2022/12/11 20:34:32 by zmoumen          ###   ########.fr       */
+/*   Updated: 2022/12/12 14:12:12 by zmoumen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ int	emit_n_wait_ack(int spid, int sent_sig)
 
 	if (kill(spid, sent_sig) == -1)
 		return (-1);
+	sleep(1);
 	if (!g_server_ack)
 		sleep(1);
 	if (g_server_ack == 0)

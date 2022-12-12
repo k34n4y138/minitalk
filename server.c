@@ -6,7 +6,7 @@
 /*   By: zmoumen <zmoumen@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/30 10:48:12 by zmoumen           #+#    #+#             */
-/*   Updated: 2022/12/11 20:11:03 by zmoumen          ###   ########.fr       */
+/*   Updated: 2022/12/12 17:08:58 by zmoumen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@ struct	s_signal {
 
 void	handler(int sig, siginfo_t *siginfo, void *ctx)
 {
+	if (g_signal.new)
+		return ;
 	g_signal.cl_pid = siginfo->si_pid;
 	g_signal.signal = sig;
 	g_signal.new = 1;
